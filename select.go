@@ -253,6 +253,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	s.list.SetCursor(cursorPos)
 	s.list.SetStart(scroll)
 
+	isQuit := false
 	c.SetListener(func(line []rune, pos int, key rune) ([]rune, int, bool) {
 		switch {
 		case key == KeyEnter:
@@ -288,6 +289,9 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 			s.list.PageUp()
 		case key == s.Keys.PageDown.Code || (key == 'l' && !searchMode):
 			s.list.PageDown()
+		case key == 'q':
+			isQuit = true
+			rl.Close()
 		default:
 			if canSearch && searchMode {
 				cur.Update(string(line))
@@ -357,6 +361,9 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		_, err = rl.Readline()
 
 		if err != nil {
+			if isQuit {
+				return -1, "", nil
+			}
 			switch {
 			case err == readline.ErrInterrupt, err.Error() == "Interrupt":
 				err = ErrInterrupt
