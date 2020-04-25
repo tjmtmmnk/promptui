@@ -363,56 +363,54 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	for {
 		if isQuit {
 			return Quit, "", nil
-		} else {
-			_, err = rl.Readline()
-			if err != nil {
-				switch {
-				case err == readline.ErrInterrupt, err.Error() == "Interrupt":
-					err = ErrInterrupt
-				case err == io.EOF:
-					err = ErrEOF
-				}
-				break
+		}
+		_, err = rl.Readline()
+		if err != nil {
+			switch {
+			case err == readline.ErrInterrupt, err.Error() == "Interrupt":
+				err = ErrInterrupt
+			case err == io.EOF:
+				err = ErrEOF
 			}
+			break
+		}
 
-			_, idx := s.list.Items()
-			if idx != list.NotFound {
-				break
-			}
+		_, idx := s.list.Items()
+		if idx != list.NotFound {
+			break
 		}
 	}
 
 	if isQuit {
 		return Quit, "", nil
-	} else {
-		if err != nil {
-			if err.Error() == "Interrupt" {
-				err = ErrInterrupt
-			}
-			sb.Reset()
-			sb.WriteString("")
-			sb.Flush()
-			rl.Write([]byte(showCursor))
-			rl.Close()
-			return 0, "", err
+	}
+	if err != nil {
+		if err.Error() == "Interrupt" {
+			err = ErrInterrupt
 		}
-
-		items, idx := s.list.Items()
-		item := items[idx]
-
-		if s.HideSelected {
-			clearScreen(sb)
-		} else {
-			sb.Reset()
-			sb.Write(render(s.Templates.selected, item))
-			sb.Flush()
-		}
-
+		sb.Reset()
+		sb.WriteString("")
+		sb.Flush()
 		rl.Write([]byte(showCursor))
 		rl.Close()
-
-		return s.list.Index(), fmt.Sprintf("%v", item), err
+		return 0, "", err
 	}
+
+	items, idx := s.list.Items()
+	item := items[idx]
+
+	if s.HideSelected {
+		clearScreen(sb)
+	} else {
+		sb.Reset()
+		sb.Write(render(s.Templates.selected, item))
+		sb.Flush()
+	}
+
+	rl.Write([]byte(showCursor))
+	rl.Close()
+
+	return s.list.Index(), fmt.Sprintf("%v", item), err
 }
 
 // ScrollPosition returns the current scroll position.
