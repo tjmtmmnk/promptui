@@ -295,7 +295,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		case key == 'q':
 			isQuit = true
 			defer rl.Close()
-			defer clearScreen(sb)
 		default:
 			if canSearch && searchMode {
 				cur.Update(string(line))
@@ -386,7 +385,6 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 	if isQuit {
 		return Quit, "", nil
 	} else {
-		fmt.Println("bbb")
 		if err != nil {
 			if err.Error() == "Interrupt" {
 				err = ErrInterrupt
