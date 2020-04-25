@@ -563,10 +563,9 @@ func (sa *SelectWithAdd) Run() (int, string, error) {
 		selected, value, err := s.innerRun(1, 0, '+')
 		if selected == Quit {
 			return 0, "", nil
-		} else {
-			if err != nil || selected != 0 {
-				return selected - 1, value, err
-			}
+		}
+		if err != nil || selected != 0 {
+			return selected - 1, value, err
 		}
 
 		// XXX run through terminal for windows
