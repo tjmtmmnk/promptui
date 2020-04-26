@@ -295,6 +295,7 @@ func (s *Select) innerRun(cursorPos, scroll int, top rune) (int, string, error) 
 		case key == 'q':
 			isQuit = true
 			defer rl.Close()
+			defer rl.Write([]byte(showCursor))
 		default:
 			if canSearch && searchMode {
 				cur.Update(string(line))
